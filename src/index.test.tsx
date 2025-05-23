@@ -1,72 +1,217 @@
-import React from "react";
 import { render, screen } from "@testing-library/react";
-// Adjust the import path if your components are in a different file, e.g., './components'
-import { If, Else, Switch, Case, Default } from "./index";
+import { If, Else, Switch, Case, Default, IfElse, ElIf } from "./index";
 
 describe("Conditional Rendering Components", () => {
-  // --- If / Else Tests ---
-  describe("If and Else Components", () => {
-    it("should render If content when condition is true", () => {
+  // --- IfElse / If / ElIf / Else Tests ---
+  describe("IfElse, If, ElIf, and Else Components", () => {
+    it("should render If content when its condition is true", () => {
       render(
-        <If condition={true}>
-          <span>If Content</span>
+        <IfElse>
+          <If condition={true}>
+            <span>If Content</span>
+          </If>
           <Else>
             <span>Else Content</span>
           </Else>
-        </If>
+        </IfElse>
       );
       expect(screen.getByText("If Content")).toBeInTheDocument();
       expect(screen.queryByText("Else Content")).not.toBeInTheDocument();
     });
 
-    it("should render Else content when condition is false", () => {
+    it("should render Else content when If condition is false", () => {
       render(
-        <If condition={false}>
-          <span>If Content</span>
+        <IfElse>
+          <If condition={false}>
+            <span>If Content</span>
+          </If>
           <Else>
             <span>Else Content</span>
           </Else>
-        </If>
+        </IfElse>
       );
       expect(screen.queryByText("If Content")).not.toBeInTheDocument();
       expect(screen.getByText("Else Content")).toBeInTheDocument();
     });
 
-    it("should render nothing if condition is false and no Else is provided", () => {
+    it("should render nothing if If condition is false and no Else is provided", () => {
       render(
-        <If condition={false}>
-          <span>If Content</span>
-        </If>
+        <IfElse>
+          <If condition={false}>
+            <span>If Content</span>
+          </If>
+        </IfElse>
       );
       expect(screen.queryByText("If Content")).not.toBeInTheDocument();
     });
 
-    it("should render If content even if Else is present but condition is true", () => {
+    it("should handle multiple children within If block correctly", () => {
       render(
-        <If condition={true}>
-          <div>Main Content</div>
-          <Else>
-            <div>Fallback Content</div>
-          </Else>
-        </If>
-      );
-      expect(screen.getByText("Main Content")).toBeInTheDocument();
-      expect(screen.queryByText("Fallback Content")).not.toBeInTheDocument();
-    });
-
-    it("should handle multiple children within If block inside of div", () => {
-      render(
-        <If condition={true}>
-          <div>
-            <p>Paragraph 1</p>
-            <p>Paragraph 2</p>
-          </div>
-        </If>
+        <IfElse>
+          <If condition={true}>
+            <div>
+              <p>Paragraph 1</p>
+              <p>Paragraph 2</p>
+            </div>
+          </If>
+        </IfElse>
       );
       expect(screen.getByText("Paragraph 1")).toBeInTheDocument();
       expect(screen.getByText("Paragraph 2")).toBeInTheDocument();
     });
+
+    it("should render ElIf content when If is false and ElIf is true", () => {
+      render(
+        <IfElse>
+          <If condition={false}>
+            <span>If Content</span>
+          </If>
+          <ElIf condition={true}>
+            <span>ElIf Content</span>
+          </ElIf>
+          <Else>
+            <span>Else Content</span>
+          </Else>
+        </IfElse>
+      );
+      expect(screen.queryByText("If Content")).not.toBeInTheDocument();
+      expect(screen.getByText("ElIf Content")).toBeInTheDocument();
+      expect(screen.queryByText("Else Content")).not.toBeInTheDocument();
+    });
+
+    it("should render the first matching ElIf when multiple ElIfs are present", () => {
+      render(
+        <IfElse>
+          <If condition={false}>
+            <span>If Content</span>
+          </If>
+          <ElIf condition={false}>
+            <span>First ElIf (False)</span>
+          </ElIf>
+          <ElIf condition={true}>
+            <span>Second ElIf (True)</span>
+          </ElIf>
+          <ElIf condition={true}>
+            <span>Third ElIf (True - should not render)</span>
+          </ElIf>
+          <Else>
+            <span>Else Content</span>
+          </Else>
+        </IfElse>
+      );
+      expect(screen.queryByText("If Content")).not.toBeInTheDocument();
+      expect(screen.queryByText("First ElIf (False)")).not.toBeInTheDocument();
+      expect(screen.getByText("Second ElIf (True)")).toBeInTheDocument();
+      expect(
+        screen.queryByText("Third ElIf (True - should not render)")
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText("Else Content")).not.toBeInTheDocument();
+    });
+
+    it("should render Else content when If and all ElIf conditions are false", () => {
+      render(
+        <IfElse>
+          <If condition={false}>
+            <span>If Content</span>
+          </If>
+          <ElIf condition={false}>
+            <span>ElIf Content 1</span>
+          </ElIf>
+          <ElIf condition={false}>
+            <span>ElIf Content 2</span>
+          </ElIf>
+          <Else>
+            <span>Else Content</span>
+          </Else>
+        </IfElse>
+      );
+      expect(screen.queryByText("If Content")).not.toBeInTheDocument();
+      expect(screen.queryByText("ElIf Content 1")).not.toBeInTheDocument();
+      expect(screen.queryByText("ElIf Content 2")).not.toBeInTheDocument();
+      expect(screen.getByText("Else Content")).toBeInTheDocument();
+    });
+
+    it("should render nothing if If, all ElIfs are false, and no Else is provided", () => {
+      render(
+        <IfElse>
+          <If condition={false}>
+            <span>If Content</span>
+          </If>
+          <ElIf condition={false}>
+            <span>ElIf Content</span>
+          </ElIf>
+        </IfElse>
+      );
+      expect(screen.queryByText("If Content")).not.toBeInTheDocument();
+      expect(screen.queryByText("ElIf Content")).not.toBeInTheDocument();
+    });
+
+    it("should prioritize If over ElIf and Else even if ElIf/Else conditions are met", () => {
+      render(
+        <IfElse>
+          <If condition={true}>
+            <span>Primary If Content</span>
+          </If>
+          <ElIf condition={true}>
+            <span>ElIf Content</span>
+          </ElIf>
+          <Else>
+            <span>Else Content</span>
+          </Else>
+        </IfElse>
+      );
+      expect(screen.getByText("Primary If Content")).toBeInTheDocument();
+      expect(screen.queryByText("ElIf Content")).not.toBeInTheDocument();
+      expect(screen.queryByText("Else Content")).not.toBeInTheDocument();
+    });
+
+    it("should log an error if no If component is provided", () => {
+      const consoleErrorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      render(
+        <IfElse>
+          <ElIf condition={true}>
+            <span>ElIf Content</span>
+          </ElIf>
+          <Else>
+            <span>Else Content</span>
+          </Else>
+        </IfElse>
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "IfElse component must contain an 'If' child."
+      );
+      expect(screen.queryByText("ElIf Content")).not.toBeInTheDocument();
+      expect(screen.queryByText("Else Content")).not.toBeInTheDocument();
+      consoleErrorSpy.mockRestore();
+    });
+
+    it("should log a warning for unexpected child types", () => {
+      const consoleWarnSpy = jest
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
+      render(
+        <IfElse>
+          <If condition={true}>
+            <span>If Content</span>
+          </If>
+          <div>Unexpected Div</div>
+        </IfElse>
+      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "IfElse component contains an unexpected child type: div. Only If, ElIf, and Else are supported."
+      );
+      expect(screen.getByText("If Content")).toBeInTheDocument();
+      expect(screen.queryByText("Unexpected Div")).not.toBeInTheDocument(); // Unexpected child is not rendered
+      consoleWarnSpy.mockRestore();
+    });
   });
+
+  // --- Switch / Case / Default Tests (Re-included for completeness, assuming they are in a separate file or will be added back) ---
+  // If your Switch/Case components are in a separate file, you'd import them and test them there.
+  // For this example, assuming they are no longer in the same file as IfElse.
+  // If they are still in the same file, you would uncomment and adjust these tests.
 
   // --- Switch / Case / Default Tests ---
   describe("Switch, Case, and Default Components", () => {

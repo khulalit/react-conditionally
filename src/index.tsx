@@ -3,12 +3,32 @@ import React from "react";
 // --- Type Definitions ---
 
 /**
+ * Props for the IfElse component.
+ * @typedef {object} IfElseProps
+ * @property {React.ReactNode} children - Should contain one If component, zero or more ElIf components, and optionally one Else component.
+ */
+interface IfElseProps {
+  children: React.ReactNode;
+}
+
+/**
  * Props for the If component.
  * @typedef {object} IfProps
  * @property {boolean} condition - The condition to evaluate.
- * @property {React.ReactNode} children - The child components to render.
+ * @property {React.ReactNode} children - The child components to render when the condition is true.
  */
 interface IfProps {
+  condition: boolean;
+  children: React.ReactNode;
+}
+
+/**
+ * Props for the ElIf component.
+ * @typedef {object} ElIfProps
+ * @property {boolean} condition - The condition to evaluate if preceding If/ElIf conditions were false.
+ * @property {React.ReactNode} children - The child components to render when this condition is true.
+ */
+interface ElIfProps {
   condition: boolean;
   children: React.ReactNode;
 }
@@ -53,43 +73,108 @@ interface DefaultProps {
   children: React.ReactNode;
 }
 
-// --- If/Else Components ---
+// --- If/ElIf/Else Components ---
 
 /**
- * If component for conditional rendering.
- * Renders its children if the 'condition' prop is true.
- * It also passes the condition result down to its children,
- * allowing an 'Else' component to pick it up.
+ * IfElse component acts as a wrapper for If, ElIf, and optional Else components.
+ * It evaluates conditions sequentially and renders the children of the first
+ * component (If or ElIf) whose condition is true. If no condition is met,
+ * it renders the children of the Else component if provided.
+ *
+ * @param {object} props - The component props.
+ * @param {React.ReactNode} props.children - Expected to contain an <If> component,
+ * zero or more <ElIf> components, and optionally an <Else> component.
  */
-export const If: React.FC<IfProps> = ({ condition, children }) => {
-  // Filter children to find the If block and potential Else block.
-  // We explicitly look for a child with type 'Else' to handle the else case.
-  const ifBlock = React.Children.toArray(children).find(
-    (child) =>
-      React.isValidElement(child) &&
-      (child.type as React.FC<ElseProps>).name !== "Else"
-  );
-  const elseBlock = React.Children.toArray(children).find(
-    (child) =>
-      React.isValidElement(child) &&
-      (child.type as React.FC<ElseProps>).name === "Else"
-  );
+export const IfElse: React.FC<IfElseProps> = ({ children }) => {
+  const childrenArray = React.Children.toArray(children);
 
-  if (condition) {
-    return ifBlock || null;
-  } else {
-    return elseBlock || null;
+  let ifComponent: React.ReactElement<IfProps> | undefined;
+  const elIfComponents: React.ReactElement<ElIfProps>[] = [];
+  let elseComponent: React.ReactElement<ElseProps> | undefined;
+
+  // First pass: Categorize and collect all valid children
+  childrenArray.forEach((child) => {
+    if (React.isValidElement(child)) {
+      if ((child.type as any).name === "If") {
+        if (ifComponent) {
+          console.warn(
+            "IfElse component should only contain one 'If' child. Ignoring subsequent 'If' children."
+          );
+        }
+        ifComponent = child as React.ReactElement<IfProps>;
+      } else if ((child.type as any).name === "ElIf") {
+        elIfComponents.push(child as React.ReactElement<ElIfProps>);
+      } else if ((child.type as any).name === "Else") {
+        if (elseComponent) {
+          console.warn(
+            "IfElse component should only contain one 'Else' child. Ignoring subsequent 'Else' children."
+          );
+        }
+        elseComponent = child as React.ReactElement<ElseProps>;
+      } else {
+        console.warn(
+          `IfElse component contains an unexpected child type: ${
+            (child.type as any).name || child.type
+          }. Only If, ElIf, and Else are supported.`
+        );
+      }
+    }
+  });
+
+  // Validate that an 'If' component is present
+  if (!ifComponent) {
+    console.error("IfElse component must contain an 'If' child.");
+    return null;
   }
+
+  // --- Conditional Rendering Logic ---
+
+  // 1. Evaluate the If condition
+  if (ifComponent.props.condition) {
+    return ifComponent.props.children;
+  }
+
+  // 2. Evaluate ElIf conditions in order
+  for (const elIf of elIfComponents) {
+    if (elIf.props.condition) {
+      return elIf.props.children;
+    }
+  }
+
+  // 3. Fallback to Else if no If or ElIf condition is met
+  return elseComponent ? elseComponent.props.children : null;
 };
 
 /**
- * Else component for conditional rendering, used in conjunction with 'If'.
- * Renders its children if the 'If' component's condition was false.
- * It doesn't have its own condition prop, as it relies on the parent 'If'.
+ * If component for conditional rendering.
+ * This component *must* be a direct child of 'IfElse' and takes a 'condition' prop.
+ * Its children are rendered if its condition is true and no preceding If/ElIf condition was true.
+ */
+export const If: React.FC<IfProps> = ({ children }) => {
+  // The actual rendering logic is handled by the parent IfElse component.
+  // This component simply serves as a container for the 'true' content.
+  return <>{children}</>;
+};
+
+/**
+ * ElIf (Else If) component for conditional rendering.
+ * This component *must* be a direct child of 'IfElse' and takes a 'condition' prop.
+ * Its children are rendered if its condition is true and all preceding If/ElIf conditions were false.
+ */
+export const ElIf: React.FC<ElIfProps> = ({ children }) => {
+  // The actual rendering logic is handled by the parent IfElse component.
+  // This component simply serves as a container for the 'else if' content.
+  return <>{children}</>;
+};
+
+/**
+ * Else component for conditional rendering, used in conjunction with 'IfElse'.
+ * This component *must* be a direct child of 'IfElse'.
+ * Its children are rendered if all preceding If/ElIf conditions within 'IfElse' were false.
  */
 export const Else: React.FC<ElseProps> = ({ children }) => {
   // This component acts as a placeholder for the else content.
-  // Its rendering is controlled by the parent 'If' component.
+  // Its rendering is controlled by the parent 'IfElse' component.
   return <>{children}</>;
 };
 
