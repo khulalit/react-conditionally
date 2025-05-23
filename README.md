@@ -1,9 +1,11 @@
 # react-conditionally
 
-[![npm version](https://badge.fury.io/js/react-conditionally.svg)](https://www.npmjs.com/package/react-conditionally)
+<!-- [![npm version](https://badge.fury.io/js/react-conditionally.svg)](https://www.npmjs.com/package/react-conditionally) -->
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/--TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![NPM Downloads](https://img.shields.io/npm/dm/react-conditionally)](https://www.npmjs.com/package/react-conditionally)
+
+<!-- [![NPM Downloads](https://img.shields.io/npm/dm/react-conditionally)](https://www.npmjs.com/package/react-conditionally) -->
 
 ---
 
