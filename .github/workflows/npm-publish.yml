@@ -1,45 +1,16 @@
-# This workflow will run tests, lint, build, and then publish a package to npmjs.com
-# when a release is created. It also runs checks on every push and pull request.
-
 name: Node.js Package CI/CD
 
 on:
   push:
     branches:
-      - main # Run on pushes to the main branch
+      - main # Run lint, test, build on pushes to the main branch
   pull_request:
     branches:
-      - main # Run on pull requests targeting the main branch
+      - main # Run lint, test, build on pull requests targeting the main branch
   release:
-    types: [created] # Only publish when a new GitHub Release is created
+    types: [created] # ONLY publish when a new GitHub Release is created
 
 jobs:
-  # Job to lint the codebase
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20 # Use Node.js 20
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: npm ci # Use npm ci for clean installs in CI
-
-      - name: Run ESLint and Prettier
-        run: npm run lint # Assuming you have a 'lint' script in package.json
-
   # Job to run tests
   test:
     needs: lint # This job depends on the 'lint' job passing
@@ -65,7 +36,8 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm test # Assuming you have a 'test' script in package.json
+
+        run: npm test
 
   # Job to build the library
   build:
@@ -92,19 +64,21 @@ jobs:
         run: npm ci
 
       - name: Build library
-        run: npm run build # Assuming you have a 'build' script that outputs to 'dist/'
+        # Assuming you have a 'build' script in package.json that outputs to 'dist/'
+        run: npm run build
 
       - name: Upload build artifacts
+        # This uploads the 'dist/' folder so the 'publish-npm' job can use it
         uses: actions/upload-artifact@v4
         with:
           name: dist-build
-          path: dist/ # Upload the 'dist' folder
+          path: dist/
 
   # Job to publish the package to npmjs.com
   publish-npm:
     needs: build # This job depends on the 'build' job passing
     runs-on: ubuntu-latest
-    # Only run this job when a release is created
+    # This 'if' condition ensures this job ONLY runs when a GitHub Release is created
     if: github.event_name == 'release' && github.event.action == 'created'
     steps:
       - name: Checkout code
@@ -114,7 +88,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://registry.npmjs.org/ # Specify npm registry
+          registry-url: https://registry.npmjs.org/
 
       - name: Cache Node.js modules
         uses: actions/cache@v4
@@ -124,16 +98,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install dependencies (needed for npm publish)
+      - name: Install dependencies (needed for npm publish, even if artifacts are used)
         run: npm ci
 
       - name: Download build artifacts
+        # Download the 'dist' folder that was uploaded by the 'build' job
         uses: actions/download-artifact@v4
         with:
           name: dist-build
-          path: dist/ # Download the 'dist' folder into the workspace
+          path: dist/
 
       - name: Publish to npm
-        run: npm publish --access public # --access public is important for open source
+        run: npm publish --access public # --access public is important for open source packages
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}} # Use the NPM_TOKEN secret
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}} # Use the NPM_TOKEN secret you configured in GitHub
