@@ -11,9 +11,8 @@ on:
     types: [created] # ONLY publish when a new GitHub Release is created
 
 jobs:
-  # Job to run tests
+  # Job to run tests. This is now the starting job, so it has no 'needs'.
   test:
-    needs: lint # This job depends on the 'lint' job passing
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -36,10 +35,10 @@ jobs:
         run: npm ci
 
       - name: Run tests
-
+        # Assuming you have a 'test' script in package.json, e.g., "test": "jest"
         run: npm test
 
-  # Job to build the library
+  # Job to build the library. It depends on 'test' passing.
   build:
     needs: test # This job depends on the 'test' job passing
     runs-on: ubuntu-latest
@@ -74,7 +73,7 @@ jobs:
           name: dist-build
           path: dist/
 
-  # Job to publish the package to npmjs.com
+  # Job to publish the package to npmjs.com. It depends on 'build' passing.
   publish-npm:
     needs: build # This job depends on the 'build' job passing
     runs-on: ubuntu-latest
@@ -88,7 +87,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://registry.npmjs.org/ # Specify npm registry
 
       - name: Cache Node.js modules
         uses: actions/cache@v4
