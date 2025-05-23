@@ -1,33 +1,139 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+# This workflow will run tests, lint, build, and then publish a package to npmjs.com
+# when a release is created. It also runs checks on every push and pull request.
 
-name: Node.js Package
+name: Node.js Package CI/CD
 
 on:
+  push:
+    branches:
+      - main # Run on pushes to the main branch
+  pull_request:
+    branches:
+      - main # Run on pull requests targeting the main branch
   release:
-    types: [created]
+    types: [created] # Only publish when a new GitHub Release is created
 
 jobs:
-  build:
+  # Job to lint the codebase
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm test
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  publish-npm:
-    needs: build
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # Use Node.js 20
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci # Use npm ci for clean installs in CI
+
+      - name: Run ESLint and Prettier
+        run: npm run lint # Assuming you have a 'lint' script in package.json
+
+  # Job to run tests
+  test:
+    needs: lint # This job depends on the 'lint' job passing
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test # Assuming you have a 'test' script in package.json
+
+  # Job to build the library
+  build:
+    needs: test # This job depends on the 'test' job passing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build library
+        run: npm run build # Assuming you have a 'build' script that outputs to 'dist/'
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-build
+          path: dist/ # Upload the 'dist' folder
+
+  # Job to publish the package to npmjs.com
+  publish-npm:
+    needs: build # This job depends on the 'build' job passing
+    runs-on: ubuntu-latest
+    # Only run this job when a release is created
+    if: github.event_name == 'release' && github.event.action == 'created'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/ # Specify npm registry
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies (needed for npm publish)
+        run: npm ci
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-build
+          path: dist/ # Download the 'dist' folder into the workspace
+
+      - name: Publish to npm
+        run: npm publish --access public # --access public is important for open source
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}} # Use the NPM_TOKEN secret
