@@ -1,5 +1,5 @@
 {
-  "name": "react-conditionally",
+  "name": "@khulalit/react-conditionally",
   "version": "1.0.0",
   "main": "dist/index.js",
   "description": "A React library for conditional rendering using If/Else and Switch/Case components.",
@@ -23,6 +23,9 @@
   ],
   "author": "Lalit",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
@@ -52,8 +55,17 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": ["<rootDir>/jest-setup.ts"],
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest-setup.ts"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
     "transform": {
       "^.+\\.(ts|tsx)$": "babel-jest"
     }
