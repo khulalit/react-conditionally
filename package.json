@@ -1,5 +1,5 @@
 {
-  "name": "@khulalit/react-conditionally",
+  "name": "@lalit-khudania/react-conditionally",
   "version": "1.0.0",
   "main": "dist/index.js",
   "description": "A React library for conditional rendering using If/Else and Switch/Case components.",
