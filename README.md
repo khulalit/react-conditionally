@@ -1,4 +1,4 @@
-# react-conditionally
+# react-if-then-else-switch
 
 <!-- [![npm version](https://badge.fury.io/js/react-conditionally.svg)](https://www.npmjs.com/package/react-conditionally) -->
 
@@ -11,7 +11,7 @@
 
 ## 🚀 Declarative Conditional Rendering for React
 
-`react-conditionally` is a lightweight and intuitive library that provides declarative components for handling conditional rendering in your React applications. Say goodbye to deeply nested ternary operators and complex `&&` chains, and embrace cleaner, more readable JSX.
+`react-if-then-else-switch` is a lightweight and intuitive library that provides declarative components for handling conditional rendering in your React applications. Say goodbye to deeply nested ternary operators and complex `&&` chains, and embrace cleaner, more readable JSX.
 
 ---
 
@@ -31,16 +31,16 @@
 
 ## 📦 Installation
 
-Install `react-conditionally` using npm or yarn:
+Install `react-if-then-else-switch` using npm or yarn:
 
 ```bash
-npm install react-conditionally
+npm install react-if-then-else-switch
 # OR
-yarn add react-conditionally
+yarn add react-if-then-else-switch
 
 ```
 
-## 🤔 Why react-conditionally?
+## 🤔 Why react-if-then-else-switch?
 
 ### While React's native JSX conditionals (&&, ? :) are powerful, they can lead to:
 
@@ -48,7 +48,7 @@ yarn add react-conditionally
 - Verbose && Chains: Multiple && operators for else if logic can be awkward and less explicit.
 - Lack of Structure: It can be hard to visually parse complex conditional blocks.
 
-### react-conditionally offers:
+### react-if-then-else-switch offers:
 
 - Improved Readability: Declarative components clearly indicate conditional blocks.
 - Structural Clarity: Your JSX visually reflects the if-else if-else flow.
