@@ -1,11 +1,11 @@
 # react-if-then-else-switch
 
-<!-- [![npm version](https://badge.fury.io/js/react-conditionally.svg)](https://www.npmjs.com/package/react-conditionally) -->
+[![npm version](https://badge.fury.io/js/react-conditionally.svg)](https://www.npmjs.com/package/react-if-then-else-switch)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/--TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-<!-- [![NPM Downloads](https://img.shields.io/npm/dm/react-conditionally)](https://www.npmjs.com/package/react-conditionally) -->
+[![NPM Downloads](https://img.shields.io/npm/dm/react-if-then-else-switch)](https://www.npmjs.com/package/react-if-then-else-switch)
 
 ---
 
@@ -14,6 +14,12 @@
 `react-if-then-else-switch` is a lightweight and intuitive library that provides declarative components for handling conditional rendering in your React applications. Say goodbye to deeply nested ternary operators and complex `&&` chains, and embrace cleaner, more readable JSX.
 
 ---
+
+## 📚 Documentation & Demos
+
+Explore live examples and detailed usage instructions in our comprehensive documentation:
+
+👉 [View Documentation & Live Demos Here](https://library-documentation.vercel.app/documentation) 👈
 
 ## ✨ Features
 
