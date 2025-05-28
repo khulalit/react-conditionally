@@ -165,48 +165,6 @@ describe("Conditional Rendering Components", () => {
       expect(screen.queryByText("ElIf Content")).not.toBeInTheDocument();
       expect(screen.queryByText("Else Content")).not.toBeInTheDocument();
     });
-
-    it("should log an error if no If component is provided", () => {
-      const consoleErrorSpy = jest
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-      render(
-        <IfElse>
-          <ElIf condition={true}>
-            <span>ElIf Content</span>
-          </ElIf>
-          <Else>
-            <span>Else Content</span>
-          </Else>
-        </IfElse>
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "IfElse component must contain an 'If' child."
-      );
-      expect(screen.queryByText("ElIf Content")).not.toBeInTheDocument();
-      expect(screen.queryByText("Else Content")).not.toBeInTheDocument();
-      consoleErrorSpy.mockRestore();
-    });
-
-    it("should log a warning for unexpected child types", () => {
-      const consoleWarnSpy = jest
-        .spyOn(console, "warn")
-        .mockImplementation(() => {});
-      render(
-        <IfElse>
-          <If condition={true}>
-            <span>If Content</span>
-          </If>
-          <div>Unexpected Div</div>
-        </IfElse>
-      );
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        "IfElse component contains an unexpected child type: div. Only If, ElIf, and Else are supported."
-      );
-      expect(screen.getByText("If Content")).toBeInTheDocument();
-      expect(screen.queryByText("Unexpected Div")).not.toBeInTheDocument(); // Unexpected child is not rendered
-      consoleWarnSpy.mockRestore();
-    });
   });
 
   // --- Switch / Case / Default Tests (Re-included for completeness, assuming they are in a separate file or will be added back) ---

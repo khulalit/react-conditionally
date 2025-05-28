@@ -95,35 +95,25 @@ export const IfElse: React.FC<IfElseProps> = ({ children }) => {
   // First pass: Categorize and collect all valid children
   childrenArray.forEach((child) => {
     if (React.isValidElement(child)) {
-      if ((child.type as any).name === "If") {
-        if (ifComponent) {
-          console.warn(
-            "IfElse component should only contain one 'If' child. Ignoring subsequent 'If' children."
-          );
+      if ((child.type as any).displayName === "If") {
+        // Only assign the first If component encountered
+        if (!ifComponent) {
+          ifComponent = child as React.ReactElement<IfProps>;
         }
-        ifComponent = child as React.ReactElement<IfProps>;
-      } else if ((child.type as any).name === "ElIf") {
+      } else if ((child.type as any).displayName === "ElIf") {
         elIfComponents.push(child as React.ReactElement<ElIfProps>);
-      } else if ((child.type as any).name === "Else") {
-        if (elseComponent) {
-          console.warn(
-            "IfElse component should only contain one 'Else' child. Ignoring subsequent 'Else' children."
-          );
+      } else if ((child.type as any).displayName === "Else") {
+        // Only assign the first Else component encountered
+        if (!elseComponent) {
+          elseComponent = child as React.ReactElement<ElseProps>;
         }
-        elseComponent = child as React.ReactElement<ElseProps>;
-      } else {
-        console.warn(
-          `IfElse component contains an unexpected child type: ${
-            (child.type as any).name || child.type
-          }. Only If, ElIf, and Else are supported.`
-        );
       }
     }
   });
 
   // Validate that an 'If' component is present
   if (!ifComponent) {
-    console.error("IfElse component must contain an 'If' child.");
+    // If no 'If' component is found, return null without an error message
     return null;
   }
 
@@ -145,6 +135,8 @@ export const IfElse: React.FC<IfElseProps> = ({ children }) => {
   return elseComponent ? elseComponent.props.children : null;
 };
 
+IfElse.displayName = "IfElse";
+
 /**
  * If component for conditional rendering.
  * This component *must* be a direct child of 'IfElse' and takes a 'condition' prop.
@@ -155,6 +147,8 @@ export const If: React.FC<IfProps> = ({ children }) => {
   // This component simply serves as a container for the 'true' content.
   return <>{children}</>;
 };
+
+If.displayName = "If";
 
 /**
  * ElIf (Else If) component for conditional rendering.
@@ -167,6 +161,8 @@ export const ElIf: React.FC<ElIfProps> = ({ children }) => {
   return <>{children}</>;
 };
 
+ElIf.displayName = "ElIf";
+
 /**
  * Else component for conditional rendering, used in conjunction with 'IfElse'.
  * This component *must* be a direct child of 'IfElse'.
@@ -177,6 +173,8 @@ export const Else: React.FC<ElseProps> = ({ children }) => {
   // Its rendering is controlled by the parent 'IfElse' component.
   return <>{children}</>;
 };
+
+Else.displayName = "Else";
 
 // --- Switch/Case Components ---
 
@@ -202,13 +200,13 @@ export const Switch: React.FC<SwitchProps> = ({ value, children }) => {
     if (React.isValidElement(child)) {
       // Type assertion to access props.when safely
       if (
-        (child.type as React.FC<CaseProps>).name === "Case" &&
+        (child.type as React.FC<CaseProps>).displayName === "Case" &&
         (child.props as CaseProps).when === value &&
         !matchedChild
       ) {
         matchedChild = child;
       } else if (
-        (child.type as React.FC<DefaultProps>).name === "Default" &&
+        (child.type as React.FC<DefaultProps>).displayName === "Default" &&
         !defaultChild
       ) {
         defaultChild = child;
@@ -224,6 +222,8 @@ export const Switch: React.FC<SwitchProps> = ({ value, children }) => {
   );
 };
 
+Switch.displayName = "Switch";
+
 /**
  * Case component for conditional rendering within a 'Switch'.
  * Renders its children if its 'when' prop matches the 'value' provided by the parent 'Switch'.
@@ -234,6 +234,8 @@ export const Case: React.FC<CaseProps> = ({ children }) => {
   return <>{children}</>;
 };
 
+Case.displayName = "Case";
+
 /**
  * Default component for 'Switch', similar to a 'default' case in a JavaScript switch statement.
  * Renders its children if no 'Case' components in the parent 'Switch' match the value.
@@ -243,3 +245,5 @@ export const Default: React.FC<DefaultProps> = ({ children }) => {
   // Its rendering is controlled by the parent 'Switch' component.
   return <>{children}</>;
 };
+
+Default.displayName = "Default";
