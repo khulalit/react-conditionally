@@ -7,8 +7,8 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 1.  **Fork** the repository to your own GitHub account.
 2.  **Clone** your forked repository to your local machine:
     ```bash
-    git clone [https://github.com/khulalit/react-conditionally.git](https://github.com/khulalit/react-conditionally.git)
-    cd react-conditionally
+    git clone https://github.com/khulalit/react-if-then-else-switch.git
+    cd react-if-then-else-switch
     ```
 3.  **Create a new branch** for your changes. Use a descriptive name (e.g., `feature/some-feature`, `bugfix/some-bug-fix`):
     ```bash
@@ -39,7 +39,7 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 
 ## Reporting Bugs / Requesting Features
 
-Please use the [GitHub Issues](https://github.com/your-github-username/react-conditionally/issues) for bug reports and feature requests.
+Please use the [GitHub Issues](https://github.com/khulalit/react-if-then-else-switch/issues) for bug reports and feature requests.
 
 ```
 
