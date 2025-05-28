@@ -6,6 +6,7 @@ import peerDepsExternal from "rollup-plugin-peer-deps-external";
 import fs from "fs"; // Import Node.js file system module
 import path from "path"; // Import Node.js path module
 import { fileURLToPath } from "url"; // Import for __dirname equivalent in ES modules
+import terser from "@rollup/plugin-terser";
 
 // Get the current directory name in ES module context
 const __filename = fileURLToPath(import.meta.url);
@@ -35,6 +36,16 @@ export default [
       resolve(), // Resolves node modules
       commonjs(), // Converts CommonJS modules to ES6
       typescript({ tsconfig: "./tsconfig.json" }), // Compiles TypeScript
+      terser({
+        ecma: 2020, // Or whatever ES version you target
+        mangle: {
+          // Prevent mangling of function/class names
+          // This is crucial for React component names and validation
+          keep_fnames: true,
+          keep_classnames: true,
+        },
+        compress: {},
+      }),
     ],
     external: ["react", "react-dom"], // Mark React and ReactDOM as external
   },
