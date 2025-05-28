@@ -21,11 +21,11 @@
 - **`<If>` Component:** Renders content only if its `condition` prop is `true`.
 - **`<ElIf>` Component:** (Else If) Renders content if its `condition` is `true` **AND** all preceding `If`/`ElIf` conditions within the same `<IfElse>` block were `false`.
 - **`<Else>` Component:** Renders content if no preceding `If` or `ElIf` conditions within the same `<IfElse>` block were `true`.
-- `<Switch>` Component: A declarative container that evaluates a value prop against multiple `<Case>` conditions. Only the first matching `<Case>` (or the `<Default>`) will render.
+- **`<Switch>` Component:** A declarative container that evaluates a value prop against multiple `<Case>` conditions. Only the first matching `<Case>` (or the `<Default>`) will render.
 
-- `<Case>` Component: Renders content if its condition prop (or a specific value prop, depending on your implementation) matches the value prop of the parent `<Switch>` component.
+- **`<Case>` Component:** Renders content if its condition prop (or a specific value prop, depending on your implementation) matches the value prop of the parent `<Switch>` component.
 
-- `<Default>` Component: Renders content if no preceding `<Case>` components within the same `<Switch>` block had a matching condition. This acts as the fallback for a Switch statement.
+- **`<Default>` Component:** Renders content if no preceding `<Case>` components within the same `<Switch>` block had a matching condition. This acts as the fallback for a Switch statement.
 
 ---
 
